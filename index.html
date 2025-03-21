@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shankfest 2025</title>
+  <!-- Google Fonts - Adding variety for better typography hierarchy -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+  <!-- Font Awesome CDN with specific version -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <style>
+    :root {
+      /* Main color palette */
+      --primary: #50fa7b;
+      --secondary: #bd93f9;
+      --dark-bg: #1d1f21;
+      --card-bg: #282a36;
+      --light-text: #f8f8f2;
+      --accent: #8be9fd;
+      --danger: #ff5555;
+      --hover-bg: #44475a;
+      
+      /* Status colors */
+      --status-low: rgba(204, 204, 102, 0.7);
+      --status-medium: rgba(204, 153, 51, 0.7);
+      --status-high: rgba(204, 51, 51, 0.7);
+    }
+    
+    /* Base styles */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Roboto', sans-serif;
+      color: var(--light-text);
+      background-color: var(--dark-bg);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+    
+    /* Typography */
+    h1, h2, h3 {
+      font-family: 'Montserrat', sans-serif;
+      margin-bottom: 1rem;
+      font-weight: 700;
+    }
+    
+    h1 {
+      font-size: 2.5rem;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    
+    h2 {
+      font-size: 1.8rem;
+      color: var(--secondary);
+    }
+    
+    h3 {
+      font-size: 1.4rem;
+      color: var(--accent);
+    }
+    
+    /* Hero Section */
+    .hero {
+      position: relative;
+      height: 30vh;
+      min-height: 250px;
+      background: linear-gradient(rgba(29, 31, 33, 0.7), rgba(29, 31, 33, 0.9)), url('/api/placeholder/1200/400');
+      background-size: cover;
+      background-position: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      border-radius: 0 0 30px 30px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+    
+    .hero h1 {
+      margin-bottom: 0.5rem;
+      font-size: 3rem;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    }
+    
+    .hero p {
+      color: var(--accent);
+      font-size: 1.2rem;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    
+    /* Main container layout */
+    .container {
+      width: 95%;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 1rem;
+    }
+    
+    /* Card styling */
+    .card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+      margin-bottom: 1.5rem;
+      overflow: hidden;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    }
+    
+    .card-header {
+      background: rgba(98, 114, 164, 0.8);
+      padding: 1rem;
+      border-bottom: 2px solid var(--primary);
+    }
+    
+    .card-body {
+      padding: 1rem;
+    }
+    
+    /* Flex layout for main content */
+    .flex-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    
+    /* Sidebar */
+    .sidebar {
+      flex: 1;
+      min-width: 280px;
+      max-width: 350px;
+    }
+    
+    /* Main content */
+    .main-content {
+      flex: 3;
+      min-width: 280px;
+    }
+    
+    /* User list */
+    .user-list {
+      max-height: 60vh;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: var(--primary) var(--card-bg);
+    }
+    
+    .user-list::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    .user-list::-webkit-scrollbar-track {
+      background: var(--card-bg);
+    }
+    
+    .user-list::-webkit-scrollbar-thumb {
+      background-color: var(--primary);
+      border-radius: 20px;
+    }
+    
+    .user-entry {
+      background-color: var(--hover-bg);
+      padding: 0.8rem;
+      margin-bottom: 0.8rem;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.2s;
+    }
+    
+    .user-entry:hover {
+      transform: scale(1.02);
+      background-color: rgba(68, 71, 90, 0.8);
+    }
+    
+    .user-info {
+      display: flex;
+      align-items: center;
+    }
+    
+    .user-avatar {
+      width: 32px;
+      height: 32px;
+      background-color: var(--primary);
+      border-radius: 50%;
+      margin-right: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: var(--dark-bg);
+    }
+    
+    .user-name {
+      font-weight: 500;
+    }
+    
+    .user-phone {
+      font-size: 0.8rem;
+      opacity: 0.8;
+    }
+    
+    .remove-btn {
+      color: var(--danger);
+      cursor: pointer;
+      transition: transform 0.2s;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+    }
+    
+    .remove-btn:hover {
+      transform: scale(1.2);
+      background-color: rgba(255, 85, 85, 0.2);
+    }
+    
+    /* Calendar styles */
+    .month-container {
+      margin-bottom: 2rem;
+    }
+    
+    .calendar {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 3px;
+      table-layout: fixed;
+    }
+    
+    .calendar th {
+      background-color: rgba(98, 114, 164, 0.8);
+      color: var(--light-text);
+      padding: 10px;
+      text-transform: uppercase;
+      font-size: 0.9rem;
+      letter-spacing: 1px;
+      border-radius: 8px;
+    }
+    
+    .calendar td {
+      height: 100px;
+      vertical-align: top;
+      padding: 8px;
+      border-radius: 8px;
+      background-color: var(--card-bg);
+      position: relative;
+      transition: all 0.3s;
+    }
+    
+    .calendar td:hover {
+      background-color: var(--hover-bg);
+      transform: scale(1.02);
+      z-index: 1;
+    }
+    
+    .calendar .day-number {
+      font-weight: 500;
+      font-size: 1.1rem;
+      color: var(--accent);
+      display: inline-block;
+      margin-bottom: 5px;
+      cursor: pointer;
+      transition: color 0.3s;
+    }
+    
+    .calendar .day-number:hover {
+      color: var(--primary);
+    }
+    
+    .calendar .names {
+      font-size: 0.85rem;
+      max-height: 65px;
+      overflow-y: auto;
+      scrollbar-width: none;
+    }
+    
+    .calendar .names::-webkit-scrollbar {
+      width: 3px;
+    }
+    
+    .calendar .names::-webkit-scrollbar-thumb {
+      background-color: var(--accent);
+    }
+    
+    .calendar .name-entry {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 3px 0;
+    }
+    
+    .calendar .disabled {
+      background-color: rgba(85, 85, 85, 0.5);
+      cursor: not-allowed;
+    }
+    
+    .calendar .disabled .no-golf {
+      position: absolute;
+      bottom: 5px;
+      right: 5px;
+      font-size: 0.7rem;
+      color: #bbbbbb;
+      display: flex;
+      align-items: center;
+    }
+    
+    .calendar .disabled .no-golf i {
+      margin-right: 3px;
+    }
+    
+    .calendar .status-low {
+      background-color: var(--status-low);
+    }
+    
+    .calendar .status-medium {
+      background-color: var(--status-medium);
+    }
+    
+    .calendar .status-high {
+      background-color: var(--status-high);
+    }
+    
+    /* Tabs for month selection */
+    .tab-container {
+      display: flex;
+      margin-bottom: 1rem;
+    }
+    
+    .tab {
+      padding: 0.8rem 1.5rem;
+      background-color: var(--card-bg);
+      color: var(--light-text);
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: all 0.3s;
+      border-radius: 8px 8px 0 0;
+      margin-right: 5px;
+    }
+    
+    .tab.active {
+      background-color: var(--primary);
+      color: var(--dark-bg);
+      font-weight: 500;
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    /* Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(3px);
+    }
+    
+    .modal-content {
+      background-color: var(--hover-bg);
+      margin: 10% auto;
+      padding: 2rem;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 450px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+      animation: slideDown 0.4s;
+      position: relative;
+      color: var(--light-text);
+    }
+    
+    @keyframes slideDown {
+      from { transform: translateY(-30px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    
+    .modal-header {
+      margin-bottom: 1.5rem;
+      position: relative;
+    }
+    
+    .close {
+      position: absolute;
+      right: 0;
+      top: 0;
+      font-size: 1.5rem;
+      color: var(--danger);
+      cursor: pointer;
+      transition: transform 0.3s;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+    }
+    
+    .close:hover {
+      transform: rotate(90deg);
+      background-color: rgba(255, 85, 85, 0.2);
+    }
+    
+    .input-group {
+      margin-bottom: 1.2rem;
+    }
+    
+    .input-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+    
+    .modal input {
+      width: 100%;
+      padding: 0.8rem 1rem;
+      border: 1px solid var(--card-bg);
+      border-radius: 8px;
+      font-size: 1rem;
+      background-color: rgba(40, 42, 54, 0.8);
+      color: var(--light-text);
+      transition: all 0.3s;
+    }
+    
+    .modal input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(80, 250, 123, 0.3);
+    }
+    
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 1.5rem;
+    }
+    
+    .btn {
+      padding: 0.7rem 1.5rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 500;
+      transition: all 0.3s;
+    }
+    
+    .btn-primary {
+      background-color: var(--primary);
+      color: var(--dark-bg);
+    }
+    
+    .btn-primary:hover {
+      background-color: var(--accent);
+      transform: translateY(-2px);
+    }
+    
+    .btn-secondary {
+      background-color: transparent;
+      color: var(--light-text);
+      border: 1px solid var(--light-text);
+    }
+    
+    .btn-secondary:hover {
+      background-color: rgba(248, 248, 242, 0.1);
+    }
+    
+    .btn-danger {
+      background-color: var(--danger);
+      color: var(--light-text);
+    }
+    
+    .btn-danger:hover {
+      background-color: #ff3333;
+    }
+    
+    /* Legend */
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-bottom: 1rem;
+      padding: 0.8rem;
+      background-color: var(--card-bg);
+      border-radius: 8px;
+    }
+    
+    .legend-item {
+      display: flex;
+      align-items: center;
+      font-size: 0.85rem;
+    }
+    
+    .legend-color {
+      width: 20px;
+      height: 20px;
+      border-radius: 4px;
+      margin-right: 5px;
+    }
+    
+    /* Stats card */
+    .stats-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .stat-card {
+      flex: 1;
+      min-width: 180px;
+      background-color: var(--card-bg);
+      border-radius: 8px;
+      padding: 1rem;
+      text-align: center;
+      transition: transform 0.3s;
+    }
+    
+    .stat-card:hover {
+      transform: translateY(-5px);
+    }
+    
+    .stat-icon {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+      color: var(--primary);
+    }
+    
+    .stat-value {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 0.2rem;
+      color: var(--accent);
+    }
+    
+    .stat-label {
+      font-size: 0.9rem;
+      color: var(--light-text);
+      opacity: 0.8;
+    }
+    
+    /* Add Button */
+    .floating-btn {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 60px;
+      height: 60px;
+      background-color: var(--primary);
+      color: var(--dark-bg);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      transition: all 0.3s;
+      z-index: 100;
+    }
+    
+    .floating-btn:hover {
+      transform: scale(1.1);
+      background-color: var(--accent);
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+    }
+    
+    /* Responsive design */
+    @media (max-width: 768px) {
+      .flex-container {
+        flex-direction: column;
+      }
+      
+      .sidebar {
+        max-width: 100%;
+      }
+      
+      .calendar td {
+        height: 80px;
+        padding: 5px;
+      }
+      
+      .hero {
+        height: 25vh;
+      }
+      
+      .hero h1 {
+        font-size: 2.2rem;
+      }
+      
+      .calendar .names {
+        max-height: 40px;
+      }
+      
+      .tab {
+        padding: 0.6rem 1rem;
+        font-size: 0.9rem;
+      }
+    }
+    
+    @media (max-width: 576px) {
+      .calendar th {
+        font-size: 0.8rem;
+        padding: 5px;
+      }
+      
+      .calendar td {
+        height: 70px;
+        padding: 3px;
+      }
+      
+      .calendar .day-number {
+        font-size: 0.9rem;
+      }
+      
+      .calendar .names {
+        font-size: 0.75rem;
+      }
+      
+      .stat-card {
+        min-width: 120px;
+      }
+      
+      .modal-content {
+        width: 95%;
+        padding: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Hero Section -->
+  <div class="hero">
+    <h1>Shankfest 2025</h1>
+    <p>Join us for a weekend of golf, camaraderie, and questionable swings.</p>
+  </div>
+  
+  <div class="container">
+    <!-- Stats Cards -->
+    <div class="stats-container">
+      <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-users"></i></div>
+        <div class="stat-value" id="totalParticipants">0</div>
+        <div class="stat-label">Participants</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-calendar-check"></i></div>
+        <div class="stat-value" id="totalAvailableDates">0</div>
+        <div class="stat-label">Available Days</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-golf-ball"></i></div>
+        <div class="stat-value" id="bestDay">TBD</div>
+        <div class="stat-label">Best Golf Day</div>
+      </div>
+    </div>
+    
+    <div class="flex-container">
+      <!-- Sidebar: Users List -->
+      <div class="sidebar">
+        <div class="card">
+          <div class="card-header">
+            <h2><i class="fas fa-users"></i> Participants</h2>
+          </div>
+          <div class="card-body">
+            <div class="user-list" id="userList"></div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Main Content: Calendar -->
+      <div class="main-content">
+        <!-- Legend -->
+        <div class="legend">
+          <div class="legend-item">
+            <div class="legend-color" style="background-color: var(--card-bg);"></div>
+            <span>Available</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background-color: var(--status-low);"></div>
+            <span>1 Person Unavailable</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background-color: var(--status-medium);"></div>
+            <span>2 People Unavailable</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background-color: var(--status-high);"></div>
+            <span>3+ People Unavailable</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color" style="background-color: rgba(85, 85, 85, 0.5);"></div>
+            <span>No Golf (Mon-Thu)</span>
+          </div>
+        </div>
+        
+        <!-- Month Tabs -->
+        <div class="tab-container">
+          <button class="tab active" data-month="july">July 2025</button>
+          <button class="tab" data-month="august">August 2025</button>
+        </div>
+        
+        <!-- Calendar Containers -->
+        <div class="tab-content active" id="july-container">
+          <!-- July calendar will be generated here -->
+        </div>
+        
+        <div class="tab-content" id="august-container">
+          <!-- August calendar will be generated here -->
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Floating Add Button -->
+  <div class="floating-btn" id="addParticipantBtn">
+    <i class="fas fa-user-plus"></i>
+  </div>
+  
+  <!-- User Modal -->
+  <div id="userModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2><i class="fas fa-user-plus"></i> Welcome to Shankfest!</h2>
+        <span class="close" id="closeUserModal"><i class="fas fa-times"></i></span>
+      </div>
+      <div class="input-group">
+        <label for="userNameInput">Your Name</label>
+        <input type="text" id="userNameInput" placeholder="Enter your name..." autocomplete="off">
+      </div>
+      <div class="input-group">
+        <label for="userPhoneInput">Phone Number</label>
+        <input type="text" id="userPhoneInput" placeholder="(555) 123-4567" autocomplete="off">
+      </div>
+      <div class="modal-footer">
+        <button id="cancelUser" class="btn btn-secondary">Cancel</button>
+        <button id="submitUser" class="btn btn-primary">Join Shankfest</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Add Unavailability Modal -->
+  <div id="addModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2><i class="fas fa-calendar-times"></i> Mark as Unavailable</h2>
+        <span class="close" id="closeAddModal"><i class="fas fa-times"></i></span>
+      </div>
+      <p id="addModalDate" class="mb-3">Date: July 4, 2025</p>
+      <div class="input-group">
+        <label for="nameInput">Your Name</label>
+        <input type="text" id="nameInput" placeholder="Enter your name..." autocomplete="off">
+      </div>
+      <div class="modal-footer">
+        <button id="cancelName" class="btn btn-secondary">Cancel</button>
+        <button id="submitName" class="btn btn-primary">Confirm</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Remove Confirmation Modal -->
+  <div id="removeModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2><i class="fas fa-trash-alt"></i> Confirm Removal</h2>
+        <span class="close" id="closeRemoveModal"><i class="fas fa-times"></i></span>
+      </div>
+      <p id="removeText">Are you sure you want to remove this entry?</p>
+      <div class="modal-footer">
+        <button id="cancelRemove" class="btn btn-secondary">Cancel</button>
+        <button id="confirmRemove" class="btn btn-danger">Remove</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    /***** IMPORT FIREBASE MODULES *****/
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+    import { getDatabase, ref, push, onValue, remove, get } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-analytics.js";
+
+    /***** CONFIGURE FIREBASE *****/
+    const firebaseConfig = {
+      apiKey: "AIzaSyC_43GMiTI9PLHV6rK9VQ41SUjJQf9RLfM",
+      authDomain: "shankfest-calendar.firebaseapp.com",
+      projectId: "shankfest-calendar",
+      storageBucket: "shankfest-calendar.appspot.com",
+      messagingSenderId: "59059464822",
+      appId: "1:59059464822:web:83a89ef79e0fa139e40d57",
+      measurementId: "G-Q9TJDHHZ6G",
+      databaseURL: "https://shankfest-calendar-default-rtdb.firebaseio.com/"
+    };
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    const db = getDatabase(app);
+
+    /***** GLOBAL VARIABLES *****/
+    let currentDate = "";
+    let removalData = {};
+    let currentUserName = "";
+    let currentUserPhone = "";
+    let userData = {};
+    let busyData = {};
+
+    /***** MODAL ELEMENTS *****/
+    // User Modal Elements
+    const userModal = document.getElementById("userModal");
+    const closeUserModal = document.getElementById("closeUserModal");
+    // Check if DOM elements exist
+    if (!userModal || !closeUserModal || !submitUserBtn || !cancelUserBtn || !userNameInput || !userPhoneInput) {
+      console.error("Critical DOM elements for user modal not found!");
+    }
+    const submitUserBtn = document.getElementById("submitUser");
+    const cancelUserBtn = document.getElementById("cancelUser");
+    const userNameInput = document.getElementById("userNameInput");
+    const userPhoneInput = document.getElementById("userPhoneInput");
+    const addParticipantBtn = document.getElementById("addParticipantBtn");
+
+    // Add Name Modal Elements
+    const addModal = document.getElementById("addModal");
+    const addModalDate = document.getElementById("addModalDate");
+    const nameInput = document.getElementById("nameInput");
+    const closeAddModal = document.getElementById("closeAddModal");
+    const submitNameBtn = document.getElementById("submitName");
+    const cancelNameBtn = document.getElementById("cancelName");
+
+    // Remove Modal Elements
+    const removeModal = document.getElementById("removeModal");
+    const removeText = document.getElementById("removeText");
+    const closeRemoveModal = document.getElementById("closeRemoveModal");
+    const confirmRemoveBtn = document.getElementById("confirmRemove");
+    const cancelRemoveBtn = document.getElementById("cancelRemove");
+
+    // Tab elements
+    const tabs = document.querySelectorAll('.tab');
+
+    /***** FUNCTIONS TO OPEN/CLOSE MODALS *****/
+    // User Modal
+    function openUserModal() {
+      userModal.style.display = "block";
+      setTimeout(() => userNameInput.focus(), 300);
+    }
+
+    function closeUserModalFunc() {
+      userModal.style.display = "none";
+    }
+
+    // Add Name Modal
+    function openAddModal(dateStr) {
+      currentDate = dateStr;
+      const dateParts = dateStr.split('-');
+      const date = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]);
+      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+      addModalDate.textContent = date.toLocaleDateString('en-US', options);
+      
+      // If we have current user data, pre-fill the input
+      nameInput.value = currentUserName || "";
+      addModal.style.display = "block";
+      setTimeout(() => nameInput.focus(), 300);
+    }
+
+    function closeAddModalFunc() {
+      addModal.style.display = "none";
+    }
+
+    // Remove Modal
+    function openRemoveModal(dateStr, key, name) {
+      removalData = { dateStr, key };
+      removeText.textContent = `Are you sure you'd like to remove "${name}" from the unavailable list?`;
+      removeModal.style.display = "block";
+    }
+
+    function closeRemoveModalFunc() {
+      removeModal.style.display = "none";
+    }
+
+    // Close modals when clicking the close or cancel buttons
+    closeUserModal.onclick = closeUserModalFunc;
+    cancelUserBtn.onclick = closeUserModalFunc;
+    closeAddModal.onclick = closeAddModalFunc;
+    cancelNameBtn.onclick = closeAddModalFunc;
+    closeRemoveModal.onclick = closeRemoveModalFunc;
+    cancelRemoveBtn.onclick = closeRemoveModalFunc;
+    
+    // Close modals if clicking outside modal content
+    window.onclick = function(event) {
+      if (event.target === userModal) closeUserModalFunc();
+      else if (event.target === addModal) closeAddModalFunc();
+      else if (event.target === removeModal) closeRemoveModalFunc();
+    };
