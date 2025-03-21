@@ -829,18 +829,14 @@
     let userData = {};
     let busyData = {};
 
-    /***** MODAL ELEMENTS *****/
+    /***** DOM ELEMENTS - Fixed order *****/
     // User Modal Elements
     const userModal = document.getElementById("userModal");
     const closeUserModal = document.getElementById("closeUserModal");
-    // Check if DOM elements exist
-    if (!userModal || !closeUserModal || !submitUserBtn || !cancelUserBtn || !userNameInput || !userPhoneInput) {
-      console.error("Critical DOM elements for user modal not found!");
-    }
-    const submitUserBtn = document.getElementById("submitUser");
-    const cancelUserBtn = document.getElementById("cancelUser");
     const userNameInput = document.getElementById("userNameInput");
     const userPhoneInput = document.getElementById("userPhoneInput");
+    const submitUserBtn = document.getElementById("submitUser");
+    const cancelUserBtn = document.getElementById("cancelUser");
     const addParticipantBtn = document.getElementById("addParticipantBtn");
 
     // Add Name Modal Elements
@@ -860,6 +856,15 @@
 
     // Tab elements
     const tabs = document.querySelectorAll('.tab');
+    
+    // Stats elements
+    const totalParticipantsEl = document.getElementById("totalParticipants");
+    const totalAvailableDatesEl = document.getElementById("totalAvailableDates");
+    const bestDayEl = document.getElementById("bestDay");
+
+    // Calendar containers
+    const julyContainer = document.getElementById("july-container");
+    const augustContainer = document.getElementById("august-container");
 
     /***** FUNCTIONS TO OPEN/CLOSE MODALS *****/
     // User Modal
@@ -915,3 +920,397 @@
       else if (event.target === addModal) closeAddModalFunc();
       else if (event.target === removeModal) closeRemoveModalFunc();
     };
+
+    /***** PHONE NUMBER FORMATTING *****/
+    function formatPhoneNumber(value) {
+      if (!value) return value;
+      const phoneNumber = value.replace(/[^\d]/g, '');
+      const phoneNumberLength = phoneNumber.length;
+      if (phoneNumberLength < 4) return phoneNumber;
+      if (phoneNumberLength < 7) {
+        return `(${phoneNumber.slice(0, 3)}) ${phoneNumber.slice(3)}`;
+      }
+      return `(${phoneNumber.slice(0, 3)}) ${phoneNumber.slice(3,6)}-${phoneNumber.slice(6,10)}`;
+    }
+
+    userPhoneInput.addEventListener("input", function(e) {
+      const formatted = formatPhoneNumber(e.target.value);
+      e.target.value = formatted;
+    });
+
+    /***** HANDLE ENTER KEY SUBMISSION *****/
+    nameInput.addEventListener("keydown", function(e) {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        submitNameBtn.click();
+      }
+    });
+
+    userNameInput.addEventListener("keydown", function(e) {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        userPhoneInput.focus();
+      }
+    });
+
+    userPhoneInput.addEventListener("keydown", function(e) {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        submitUserBtn.click();
+      }
+    });
+
+    /***** CALENDAR GENERATION FUNCTIONS *****/
+    function generateCalendar(month, year) {
+      const table = document.createElement('table');
+      table.className = 'calendar';
+      
+      // Create header row
+      const header = document.createElement('tr');
+      ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].forEach(day => {
+        const th = document.createElement('th');
+        th.textContent = day;
+        header.appendChild(th);
+      });
+      table.appendChild(header);
+      
+      // Get first day of month and total days in month
+      const firstDay = new Date(year, month, 1).getDay();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      
+      let date = 1;
+      
+      // Create calendar rows
+      for (let i = 0; i < 6; i++) {
+        const row = document.createElement('tr');
+        for (let j = 0; j < 7; j++) {
+          const cell = document.createElement('td');
+          
+          if (i === 0 && j < firstDay) {
+            // Empty cells before the first day of the month
+            cell.textContent = "";
+          } else if (date > daysInMonth) {
+            // Empty cells after the last day of the month
+            cell.textContent = "";
+          } else {
+            // Format date string for Firebase key (YYYY-M-D)
+            const dateStr = `${year}-${month+1}-${date}`;
+            
+            // Create day number div
+            const dayNumberDiv = document.createElement('div');
+            dayNumberDiv.className = 'day-number';
+            dayNumberDiv.textContent = date;
+            dayNumberDiv.setAttribute('data-date', dateStr);
+            
+            // Create names container div
+            const namesDiv = document.createElement('div');
+            namesDiv.className = 'names';
+            
+            cell.appendChild(dayNumberDiv);
+            cell.appendChild(namesDiv);
+            
+            // Check if it's Monday through Thursday (disable those days)
+            const currentDateObj = new Date(year, month, date);
+            const dayOfWeek = currentDateObj.getDay(); // 0=Sun, 1=Mon, ..., 6=Sat
+            
+            if (dayOfWeek >= 1 && dayOfWeek <= 4) {
+              // Monday through Thursday - disable
+              cell.classList.add('disabled');
+              
+              // Add "No Golf" label
+              const noGolfDiv = document.createElement('div');
+              noGolfDiv.className = 'no-golf';
+              noGolfDiv.innerHTML = '<i class="fas fa-ban"></i> No Golf';
+              cell.appendChild(noGolfDiv);
+            } else {
+              // For Friday, Saturday, Sunday - add click event
+              dayNumberDiv.addEventListener('click', function() {
+                openAddModal(dateStr);
+              });
+            }
+            
+            date++;
+          }
+          
+          row.appendChild(cell);
+        }
+        
+        table.appendChild(row);
+        
+        // Stop if we've used all days of the month
+        if (date > daysInMonth) break;
+      }
+      
+      return table;
+    }
+
+    function loadCalendars() {
+      // Generate July calendar
+      julyContainer.innerHTML = '';
+      julyContainer.appendChild(generateCalendar(6, 2025)); // July is month 6 (0-indexed)
+      
+      // Generate August calendar
+      augustContainer.innerHTML = '';
+      augustContainer.appendChild(generateCalendar(7, 2025)); // August is month 7 (0-indexed)
+      
+      // Update the busy dates after calendars are loaded
+      updateBusyDates();
+    }
+
+    /***** TAB FUNCTIONALITY *****/
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        // Remove active class from all tabs and content
+        tabs.forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(content => {
+          content.classList.remove('active');
+        });
+        
+        // Add active class to clicked tab and its content
+        tab.classList.add('active');
+        const month = tab.getAttribute('data-month');
+        document.getElementById(`${month}-container`).classList.add('active');
+      });
+    });
+
+    /***** UPDATE BUSY DATES ON CALENDAR *****/
+    function updateBusyDates() {
+      // For each date in the busy data
+      Object.entries(busyData).forEach(([dateStr, names]) => {
+        // Find all day elements with this date
+        const dayElements = document.querySelectorAll(`.day-number[data-date="${dateStr}"]`);
+        
+        dayElements.forEach(dayEl => {
+          const namesDiv = dayEl.nextElementSibling;
+          namesDiv.innerHTML = ''; // Clear existing names
+          
+          const cell = dayEl.parentElement;
+          
+          // Skip if cell is already disabled (Mon-Thu)
+          if (cell.classList.contains('disabled')) return;
+          
+          // Get entries for this date
+          const entries = Object.entries(names);
+          
+          // Add each name to the names div
+          entries.forEach(([key, name]) => {
+            const nameEntry = document.createElement('div');
+            nameEntry.className = 'name-entry';
+            
+            const nameSpan = document.createElement('span');
+            nameSpan.textContent = name;
+            
+            const removeBtn = document.createElement('span');
+            removeBtn.innerHTML = '<i class="fas fa-times"></i>';
+            removeBtn.className = 'remove-btn';
+            removeBtn.addEventListener('click', (e) => {
+              e.stopPropagation();
+              openRemoveModal(dateStr, key, name);
+            });
+            
+            nameEntry.appendChild(nameSpan);
+            nameEntry.appendChild(removeBtn);
+            namesDiv.appendChild(nameEntry);
+          });
+          
+          // Update cell color based on number of unavailable people
+          const count = entries.length;
+          
+          // Remove previous status classes
+          cell.classList.remove('status-low', 'status-medium', 'status-high');
+          
+          // Add appropriate status class
+          if (count === 1) cell.classList.add('status-low');
+          else if (count === 2) cell.classList.add('status-medium');
+          else if (count >= 3) cell.classList.add('status-high');
+        });
+      });
+      
+      // Update statistics
+      updateStats();
+    }
+
+    /***** UPDATE STATISTICS *****/
+    function updateStats() {
+      // Count total participants
+      const participantCount = Object.keys(userData).length;
+      totalParticipantsEl.textContent = participantCount;
+      
+      // Count available golf days (Friday, Saturday, Sunday in July and August)
+      // There are 9 Fridays, Saturdays, and Sundays in July + August 2025
+      const availableDays = 9;
+      totalAvailableDatesEl.textContent = availableDays;
+      
+      // Find best day (day with fewest unavailable people)
+      if (Object.keys(busyData).length > 0) {
+        let bestDateStr = '';
+        let leastBusy = Infinity;
+        
+        Object.entries(busyData).forEach(([dateStr, names]) => {
+          const count = Object.keys(names).length;
+          const date = new Date(dateStr);
+          const dayOfWeek = date.getDay();
+          
+          // Only consider Friday, Saturday, Sunday
+          if (dayOfWeek === 0 || dayOfWeek === 5 || dayOfWeek === 6) {
+            if (count < leastBusy) {
+              leastBusy = count;
+              bestDateStr = dateStr;
+            }
+          }
+        });
+        
+        if (bestDateStr) {
+          const bestDate = new Date(bestDateStr);
+          const options = { month: 'short', day: 'numeric' };
+          bestDayEl.textContent = bestDate.toLocaleDateString('en-US', options);
+        } else {
+          bestDayEl.textContent = "TBD";
+        }
+      } else {
+        // If no data, show TBD
+        bestDayEl.textContent = "TBD";
+      }
+    }
+
+    /***** HANDLE USER MODAL SUBMISSION *****/
+    submitUserBtn.onclick = async function() {
+      const userName = userNameInput.value.trim();
+      const userPhoneRaw = userPhoneInput.value.trim();
+      const userPhone = formatPhoneNumber(userPhoneRaw);
+      
+      if (userName && userPhone) {
+        // Check for duplicate
+        const usersSnapshot = await get(ref(db, 'users'));
+        let duplicate = false;
+        
+        if (usersSnapshot.exists()) {
+          const usersEntries = usersSnapshot.val();
+          Object.values(usersEntries).forEach(user => {
+            if (user.name.trim().toLowerCase() === userName.toLowerCase() &&
+                user.phone.trim() === userPhone) {
+              duplicate = true;
+            }
+          });
+        }
+        
+        if (!duplicate) {
+          // Add new user to Firebase
+          push(ref(db, 'users'), { name: userName, phone: userPhone });
+          
+          // Save current user info
+          currentUserName = userName;
+          currentUserPhone = userPhone;
+        }
+        
+        closeUserModalFunc();
+      }
+    };
+
+    /***** FLOATING BUTTON TO ADD NEW PARTICIPANT *****/
+    addParticipantBtn.addEventListener('click', function() {
+      // Clear the inputs
+      userNameInput.value = '';
+      userPhoneInput.value = '';
+      openUserModal();
+    });
+
+    /***** HANDLE ADD NAME SUBMISSION FOR CALENDAR *****/
+    submitNameBtn.onclick = async function() {
+      const name = nameInput.value.trim();
+      if (name !== "") {
+        // Check for duplicate
+        const busySnapshot = await get(ref(db, 'busy/' + currentDate));
+        let duplicate = false;
+        
+        if (busySnapshot.exists()) {
+          const busyEntries = busySnapshot.val();
+          Object.values(busyEntries).forEach(existingName => {
+            if (existingName.trim().toLowerCase() === name.toLowerCase()) {
+              duplicate = true;
+            }
+          });
+        }
+        
+        if (!duplicate) {
+          // Add to Firebase
+          push(ref(db, 'busy/' + currentDate), name);
+        }
+      }
+      
+      closeAddModalFunc();
+    };
+
+    /***** HANDLE REMOVE CONFIRMATION *****/
+    confirmRemoveBtn.onclick = function() {
+      remove(ref(db, 'busy/' + removalData.dateStr + '/' + removalData.key));
+      closeRemoveModalFunc();
+    };
+
+    /***** LISTEN FOR REALTIME DATABASE CHANGES (User List) *****/
+    const usersRef = ref(db, 'users');
+    onValue(usersRef, (snapshot) => {
+      userData = snapshot.val() || {};
+      const userListDiv = document.getElementById("userList");
+      userListDiv.innerHTML = "";
+      
+      Object.entries(userData).forEach(([key, user]) => {
+        const userEntry = document.createElement('div');
+        userEntry.className = 'user-entry';
+        
+        const userInfo = document.createElement('div');
+        userInfo.className = 'user-info';
+        
+        // Create avatar with first initial
+        const userAvatar = document.createElement('div');
+        userAvatar.className = 'user-avatar';
+        userAvatar.textContent = user.name.charAt(0).toUpperCase();
+        
+        // Create name and phone container
+        const userDetails = document.createElement('div');
+        const userName = document.createElement('div');
+        userName.className = 'user-name';
+        userName.textContent = user.name;
+        
+        const userPhone = document.createElement('div');
+        userPhone.className = 'user-phone';
+        userPhone.textContent = user.phone;
+        
+        userDetails.appendChild(userName);
+        userDetails.appendChild(userPhone);
+        
+        userInfo.appendChild(userAvatar);
+        userInfo.appendChild(userDetails);
+        
+        // Create remove button
+        const removeBtn = document.createElement('div');
+        removeBtn.className = 'remove-btn';
+        removeBtn.innerHTML = '<i class="fas fa-times"></i>';
+        removeBtn.addEventListener('click', () => {
+          remove(ref(db, 'users/' + key));
+        });
+        
+        userEntry.appendChild(userInfo);
+        userEntry.appendChild(removeBtn);
+        userListDiv.appendChild(userEntry);
+      });
+      
+      // Update statistics
+      updateStats();
+    });
+
+    /***** LISTEN FOR REALTIME DATABASE CHANGES (Calendar) *****/
+    const busyRef = ref(db, 'busy');
+    onValue(busyRef, (snapshot) => {
+      busyData = snapshot.val() || {};
+      updateBusyDates();
+    });
+
+    // Load calendars on page load
+    loadCalendars();
+    
+    // Show the user details modal on first load
+    openUserModal();
+  </script>
+</body>
+</html>
