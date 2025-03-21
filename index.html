@@ -10,20 +10,20 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <style>
     :root {
-      /* Main color palette */
-      --primary: #50fa7b;
-      --secondary: #bd93f9;
-      --dark-bg: #1d1f21;
-      --card-bg: #282a36;
-      --light-text: #f8f8f2;
-      --accent: #8be9fd;
-      --danger: #ff5555;
-      --hover-bg: #44475a;
+      /* Golf-themed color palette */
+      --primary: #4a7c59;         /* Deep green (fairway) */
+      --secondary: #1e5f74;       /* Blue (water hazard) */
+      --dark-bg: #333333;         /* Dark gray (professional look) */
+      --card-bg: #444444;         /* Medium gray */
+      --light-text: #ffffff;      /* White (golf ball) */
+      --accent: #8fc1e3;          /* Light blue (sky) */
+      --danger: #d95032;          /* Red (flag) */
+      --hover-bg: #555555;        /* Lighter gray for hover states */
       
-      /* Status colors */
-      --status-low: rgba(204, 204, 102, 0.7);
-      --status-medium: rgba(204, 153, 51, 0.7);
-      --status-high: rgba(204, 51, 51, 0.7);
+      /* Status colors - more golf-related */
+      --status-low: rgba(139, 195, 74, 0.7);    /* Light green (rough) */
+      --status-medium: rgba(241, 196, 15, 0.7); /* Sand (bunker) */
+      --status-high: rgba(217, 80, 50, 0.7);    /* Red (hazard) */
     }
     
     /* Base styles */
@@ -658,7 +658,7 @@
 <body>
   <!-- Hero Section -->
   <div class="hero">
-    <h1>Shankfest 2025</h1>
+    <h1><i class="fas fa-golf-ball"></i> Shankfest 2025</h1>
     <p>Join us for a weekend of golf, camaraderie, and questionable swings.</p>
   </div>
   
@@ -897,7 +897,7 @@
 
     // Remove Modal
     function openRemoveModal(dateStr, key, name) {
-      removalData = { dateStr, key };
+      removalData = { type: 'calendar', dateStr, key };
       removeText.textContent = `Are you sure you'd like to remove "${name}" from the unavailable list?`;
       removeModal.style.display = "block";
     }
@@ -1023,9 +1023,17 @@
               noGolfDiv.innerHTML = '<i class="fas fa-ban"></i> No Golf';
               cell.appendChild(noGolfDiv);
             } else {
-              // For Friday, Saturday, Sunday - add click event
+              // For Friday, Saturday, Sunday - add click event to both number and cell
               dayNumberDiv.addEventListener('click', function() {
                 openAddModal(dateStr);
+              });
+              
+              // Also make the entire cell clickable (Enhancement #1)
+              cell.addEventListener('click', function(e) {
+                // Only trigger if the click wasn't on a child element with its own handler
+                if (e.target === cell) {
+                  openAddModal(dateStr);
+                }
               });
             }
             
@@ -1243,7 +1251,13 @@
 
     /***** HANDLE REMOVE CONFIRMATION *****/
     confirmRemoveBtn.onclick = function() {
-      remove(ref(db, 'busy/' + removalData.dateStr + '/' + removalData.key));
+      if (removalData.type === 'user') {
+        // Remove participant
+        remove(ref(db, 'users/' + removalData.key));
+      } else {
+        // Remove calendar entry
+        remove(ref(db, 'busy/' + removalData.dateStr + '/' + removalData.key));
+      }
       closeRemoveModalFunc();
     };
 
@@ -1287,7 +1301,10 @@
         removeBtn.className = 'remove-btn';
         removeBtn.innerHTML = '<i class="fas fa-times"></i>';
         removeBtn.addEventListener('click', () => {
-          remove(ref(db, 'users/' + key));
+          // Enhancement #2: Show confirmation dialog before removing participant
+          removeText.textContent = `Are you sure you want to remove ${user.name} from participants?`;
+          removalData = { type: 'user', key: key };
+          removeModal.style.display = "block";
         });
         
         userEntry.appendChild(userInfo);
